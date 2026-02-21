@@ -74,10 +74,10 @@
     <div class="grid-two">
       <form on:submit|preventDefault={createAccount}>
         <h3>Crea account</h3>
-        <label>Username</label>
-        <input bind:value={signupUsername} required minlength="3" />
-        <label>Password</label>
-        <input type="password" bind:value={signupPassword} required minlength="4" />
+        <label for="signup-username">Username</label>
+        <input id="signup-username" bind:value={signupUsername} required minlength="3" />
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" bind:value={signupPassword} required minlength="4" />
         <label>
           <input type="checkbox" bind:checked={signupIsMaster} />
           Crea come Master (isMaster)
@@ -87,10 +87,10 @@
 
       <form on:submit|preventDefault={doLogin}>
         <h3>Login</h3>
-        <label>Username</label>
-        <input bind:value={loginUsername} required />
-        <label>Password</label>
-        <input type="password" bind:value={loginPassword} required />
+        <label for="login-username">Username</label>
+        <input id="login-username" bind:value={loginUsername} required />
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" bind:value={loginPassword} required />
         <button type="submit" disabled={loading}>Entra</button>
       </form>
     </div>

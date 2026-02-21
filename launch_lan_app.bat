@@ -3,7 +3,7 @@ setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 REM ============================================
 REM LAN Game One-Click Launcher (Windows)
-REM Double-click this file to start backend+frontend
+REM Runs backend+frontend without spawning extra CMD windows
 REM ============================================
 
 set "ROOT=%~dp0"
@@ -12,6 +12,8 @@ set "FRONTEND_DIR=%ROOT%frontend"
 set "ROOT_VENV_PY=%ROOT%.venv\Scripts\python.exe"
 set "BACKEND_VENV_PY=%BACKEND_DIR%\.venv\Scripts\python.exe"
 set "BACKEND_PY="
+set "BACKEND_LOG=%ROOT%backend-dev.log"
+set "FRONTEND_LOG=%ROOT%frontend-dev.log"
 
 REM -------- Resolve host LAN IP (best effort) --------
 for /f "tokens=2 delims=:" %%i in ('ipconfig ^| findstr /R /C:"IPv4 Address"') do (
@@ -63,7 +65,6 @@ if "%BACKEND_PY%"=="" (
   echo           - .venv\Scripts\python.exe
   echo           - py launcher on PATH
   echo           - python on PATH
-  echo         Ask setup person to run initial install once.
   pause
   exit /b 1
 )
@@ -83,17 +84,25 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM -------- Start backend in new window --------
-start "LAN Backend" cmd /k "cd /d ""%BACKEND_DIR%"" && %BACKEND_PY% manage.py runserver 0.0.0.0:8000"
+REM -------- Start backend/frontend in background (single window mode) --------
+if exist "%BACKEND_LOG%" del /q "%BACKEND_LOG%"
+if exist "%FRONTEND_LOG%" del /q "%FRONTEND_LOG%"
 
-REM -------- Start frontend in new window --------
-start "LAN Frontend" cmd /k "cd /d ""%FRONTEND_DIR%"" && npm run dev -- --host 0.0.0.0 --port 5173"
+echo [LAN-GAME] Launching backend (logs: %BACKEND_LOG%)
+start "" /b cmd /c "cd /d ""%BACKEND_DIR%"" && %BACKEND_PY% manage.py runserver 0.0.0.0:8000 > ""%BACKEND_LOG%"" 2>&1"
+
+echo [LAN-GAME] Launching frontend (logs: %FRONTEND_LOG%)
+start "" /b cmd /c "cd /d ""%FRONTEND_DIR%"" && npm run dev -- --host 0.0.0.0 --port 5173 > ""%FRONTEND_LOG%"" 2>&1"
 
 REM Give Vite a short head start before opening browser
-ping -n 3 127.0.0.1 >nul
+ping -n 4 127.0.0.1 >nul
 start "" "http://127.0.0.1:5173"
 
-echo [LAN-GAME] Done. Keep the two opened windows running.
-echo [LAN-GAME] Close those windows to stop the app.
+echo.
+echo [LAN-GAME] Browser opened. This launcher window can be closed.
+echo [LAN-GAME] Services continue running in the background.
+echo [LAN-GAME] To stop them later:
+echo   taskkill /FI "WINDOWTITLE eq *runserver*" /F
+echo   taskkill /FI "IMAGENAME eq node.exe" /F
 echo.
 pause
