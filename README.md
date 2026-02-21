@@ -68,6 +68,27 @@ Copy-Item .env.example .env
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
+
+## Grandma mode (double-click startup on Windows)
+
+If you want non-technical users to avoid terminals entirely:
+
+1. Do one-time setup on the **host PC only** (developer/admin): install backend dependencies and run `npm install` in `frontend`.
+2. Then users only need to **double-click** `launch_lan_app.bat` from the project root.
+3. The launcher will:
+   - auto-create `.venv` on first run if needed
+   - auto-install backend/frontend dependencies on first run
+   - run Django migrations automatically
+   - start Django on `0.0.0.0:8000`
+   - start Vite on `0.0.0.0:5173`
+   - open the browser automatically
+
+4. The launcher window closes itself after startup, so only two service windows stay open (`LAN Backend` + `LAN Frontend`).
+
+Important: other LAN users do **not** need the repo, Python, Node, or a venv. They only open the shared URL in a browser.
+
+To stop the app, close the two command windows titled `LAN Backend` and `LAN Frontend`.
+
 ## SPA navigation
 
 Navigation is handled by Svelte store state (`activeView`) and component switching in `App.svelte`. Buttons in `NavTabs.svelte` only update store state, so there are no full page reloads.
