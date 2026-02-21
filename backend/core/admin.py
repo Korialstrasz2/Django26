@@ -1,0 +1,9 @@
+from django.contrib import admin
+from core.models import PlayerProfile
+
+
+@admin.register(PlayerProfile)
+class PlayerProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'is_master')
+    search_fields = ('user__username',)
+    list_filter = ('is_master',)

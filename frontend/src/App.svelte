@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import NavTabs from './components/NavTabs.svelte';
+  import CoderHelpView from './views/CoderHelpView.svelte';
   import MenuView from './views/MenuView.svelte';
-  import { activeView, latestPing, wsStatus } from './stores/appState';
+  import { activeView, authUser, latestPing, wsStatus } from './stores/appState';
   import { apiClient, type HelloPayload } from './lib/api/client';
   import { getCachedHello, setCachedHello } from './lib/db';
   import { connectPingSocket, closePingSocket } from './lib/ws/pingSocket';
@@ -34,11 +35,28 @@
     }
   }
 
+  async function loadCurrentUser() {
+    try {
+      authUser.set(await apiClient.getCurrentUser());
+    } catch {
+      authUser.set({ username: '', isAuthenticated: false, isMaster: false });
+    }
+  }
+
   onMount(async () => {
     await initCacheVersioning();
     await loadHello();
+    await loadCurrentUser();
     connectPingSocket();
   });
+
+  $: if (!$authUser.isAuthenticated && $activeView === 'player') {
+    activeView.set('menu');
+  }
+
+  $: if (!$authUser.isMaster && $activeView === 'coderHelp') {
+    activeView.set('menu');
+  }
 
   $: if ($activeView === 'player' && !PlayerView) {
     import('./views/PlayerView.svelte').then((module) => {
@@ -57,6 +75,8 @@
 
   {#if $activeView === 'menu'}
     <MenuView />
+  {:else if $activeView === 'coderHelp' && $authUser.isMaster}
+    <CoderHelpView />
   {:else if PlayerView}
     <svelte:component this={PlayerView} />
   {/if}
