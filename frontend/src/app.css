@@ -18,6 +18,17 @@ button {
   margin-right: 0.5rem;
 }
 
+input {
+  width: 100%;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.4rem;
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+}
+
 .card {
   background: #1f2937;
   border-radius: 8px;
@@ -31,4 +42,10 @@ button {
 
 .status-offline {
   color: #f87171;
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
