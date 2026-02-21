@@ -33,3 +33,17 @@ class AuthUserResponse(Schema):
 class AuthMessageResponse(Schema):
     message: str
     user: AuthUserResponse
+
+
+class UserSettingsResponse(Schema):
+    selectedStyleFolder: str
+    availableStyleFolders: list[str]
+    backgrounds: dict[str, str]
+
+
+class UserSettingsUpdateRequest(Schema):
+    selectedStyleFolder: str
+
+
+class CacheClearResponse(Schema):
+    message: str

@@ -10,6 +10,12 @@ export type AuthUser = {
   isMaster: boolean;
 };
 
+export type UserSettings = {
+  selectedStyleFolder: string;
+  availableStyleFolders: string[];
+  backgrounds: Record<string, string>;
+};
+
 type AuthPayload = {
   message: string;
   user: AuthUser;
@@ -42,6 +48,14 @@ async function postJson<T>(path: string, body?: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+function toAbsoluteMediaUrl(path: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
+}
+
 export const apiClient = {
   getHello: () => getJson<HelloPayload>('/api/hello'),
   getHealth: () => getJson<{ status: string; uptime_hint: string }>('/api/health'),
@@ -50,5 +64,10 @@ export const apiClient = {
     postJson<AuthPayload>('/api/auth/signup', { username, password, isMaster }),
   login: (username: string, password: string) =>
     postJson<AuthPayload>('/api/auth/login', { username, password }),
-  logout: () => postJson<AuthPayload>('/api/auth/logout')
+  logout: () => postJson<AuthPayload>('/api/auth/logout'),
+  getSettings: () => getJson<UserSettings>('/api/settings'),
+  updateSettings: (selectedStyleFolder: string) =>
+    postJson<UserSettings>('/api/settings', { selectedStyleFolder }),
+  requestCacheClear: () => postJson<{ message: string }>('/api/settings/cache/clear'),
+  toAbsoluteMediaUrl
 };

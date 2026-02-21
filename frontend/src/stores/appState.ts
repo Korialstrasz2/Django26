@@ -1,12 +1,7 @@
 import { writable } from 'svelte/store';
+import type { AuthUser, UserSettings } from '../lib/api/client';
 
 export type ViewName = 'menu' | 'player' | 'coderHelp';
-
-export type AuthUser = {
-  username: string;
-  isAuthenticated: boolean;
-  isMaster: boolean;
-};
 
 const savedView = (localStorage.getItem('activeView') as ViewName) || 'menu';
 
@@ -17,6 +12,12 @@ export const authUser = writable<AuthUser>({
   username: '',
   isAuthenticated: false,
   isMaster: false
+});
+
+export const userSettings = writable<UserSettings>({
+  selectedStyleFolder: '',
+  availableStyleFolders: [],
+  backgrounds: {}
 });
 
 activeView.subscribe((value) => {
