@@ -76,14 +76,12 @@ If you want non-technical users to avoid terminals entirely:
 1. Do one-time setup on the **host PC only** (developer/admin): install backend dependencies and run `npm install` in `frontend`.
 2. Then users only need to **double-click** `launch_lan_app.bat` from the project root.
 3. The launcher will:
-   - auto-create `.venv` on first run if needed
-   - auto-install backend/frontend dependencies on first run
-   - run Django migrations automatically
-   - start Django on `0.0.0.0:8000`
-   - start Vite on `0.0.0.0:5173`
-   - open the browser automatically
+   - start Django backend on `0.0.0.0:8000`
+   - start Vite frontend on `0.0.0.0:5173`
+   - open the local browser automatically
+   - print the LAN URL to share with other PCs (example `http://192.168.1.50:5173`)
 
-4. The launcher window closes itself after startup, so only two service windows stay open (`LAN Backend` + `LAN Frontend`).
+4. Python can be in either `backend\.venv` or repo-root `.venv`; the launcher auto-detects both.
 
 Important: other LAN users do **not** need the repo, Python, Node, or a venv. They only open the shared URL in a browser.
 
