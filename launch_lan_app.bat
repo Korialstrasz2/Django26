@@ -9,6 +9,9 @@ REM ============================================
 set "ROOT=%~dp0"
 set "BACKEND_DIR=%ROOT%backend"
 set "FRONTEND_DIR=%ROOT%frontend"
+set "ROOT_VENV_PY=%ROOT%.venv\Scripts\python.exe"
+set "BACKEND_VENV_PY=%BACKEND_DIR%\.venv\Scripts\python.exe"
+set "BACKEND_PY="
 
 REM -------- Resolve host LAN IP (best effort) --------
 for /f "tokens=2 delims=:" %%i in ('ipconfig ^| findstr /R /C:"IPv4 Address"') do (
@@ -37,8 +40,29 @@ if not exist "%BACKEND_DIR%\manage.py" (
   exit /b 1
 )
 
-if not exist "%BACKEND_DIR%\.venv\Scripts\python.exe" (
-  echo [ERROR] Missing backend virtualenv python: backend\.venv\Scripts\python.exe
+if exist "%BACKEND_VENV_PY%" (
+  set "BACKEND_PY=%BACKEND_VENV_PY%"
+) else if exist "%ROOT_VENV_PY%" (
+  set "BACKEND_PY=%ROOT_VENV_PY%"
+) else (
+  where py >nul 2>&1
+  if not errorlevel 1 (
+    set "BACKEND_PY=py"
+  ) else (
+    where python >nul 2>&1
+    if not errorlevel 1 (
+      set "BACKEND_PY=python"
+    )
+  )
+)
+
+if "%BACKEND_PY%"=="" (
+  echo [ERROR] Could not find a Python executable for backend.
+  echo         Checked:
+  echo           - backend\.venv\Scripts\python.exe
+  echo           - .venv\Scripts\python.exe
+  echo           - py launcher on PATH
+  echo           - python on PATH
   echo         Ask setup person to run initial install once.
   pause
   exit /b 1
@@ -60,7 +84,7 @@ if errorlevel 1 (
 )
 
 REM -------- Start backend in new window --------
-start "LAN Backend" cmd /k "cd /d ""%BACKEND_DIR%"" && .venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000"
+start "LAN Backend" cmd /k "cd /d ""%BACKEND_DIR%"" && %BACKEND_PY% manage.py runserver 0.0.0.0:8000"
 
 REM -------- Start frontend in new window --------
 start "LAN Frontend" cmd /k "cd /d ""%FRONTEND_DIR%"" && npm run dev -- --host 0.0.0.0 --port 5173"
